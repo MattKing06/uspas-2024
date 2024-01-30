@@ -40,7 +40,7 @@ for i in range(len(cavity_phases)):
 epics.caput(cavity_name + ":CtlPhaseSet", initial_phase)
 
 # Plot the results.
-plt.plot(cavity_phases, bpm_phases, 'o')
+plt.plot(cavity_phases, bpm_phases, "o")
 plt.xlabel("Cavity Phase [degrees]")
 plt.ylabel("BPM Phase [degrees]")
 plt.show()
