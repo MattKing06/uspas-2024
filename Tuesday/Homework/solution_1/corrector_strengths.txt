@@ -1,0 +1,29 @@
+Corrector Strengths after Closing Orbit
+=======================================
+Initial Corr Strength = 0.01
+------------------------------------
+MEBT_Mag:PS_DCV01 Strength[T] = 0.01
+MEBT_Mag:PS_DCV04 Strength[T] = 2.4508415180993226e-08
+MEBT_Mag:PS_DCV05 Strength[T] = -0.1
+MEBT_Mag:PS_DCV10 Strength[T] = -0.1
+MEBT_Mag:PS_DCV11 Strength[T] = 0.1
+MEBT_Mag:PS_DCV14 Strength[T] = 0.1
+
+Initial Corr Strength = 0.05
+------------------------------------
+MEBT_Mag:PS_DCV01 Strength[T] = 0.05
+MEBT_Mag:PS_DCV04 Strength[T] = -1.9314611917654878e-08
+MEBT_Mag:PS_DCV05 Strength[T] = -0.1
+MEBT_Mag:PS_DCV10 Strength[T] = -0.1
+MEBT_Mag:PS_DCV11 Strength[T] = 0.1
+MEBT_Mag:PS_DCV14 Strength[T] = -0.1
+
+Initial Corr Strength = 0.07
+------------------------------------
+MEBT_Mag:PS_DCV01 Strength[T] = 0.07
+MEBT_Mag:PS_DCV04 Strength[T] = 5.934638592618863e-09
+MEBT_Mag:PS_DCV05 Strength[T] = -0.1
+MEBT_Mag:PS_DCV10 Strength[T] = -0.1
+MEBT_Mag:PS_DCV11 Strength[T] = 0.1
+MEBT_Mag:PS_DCV14 Strength[T] = -0.1
+

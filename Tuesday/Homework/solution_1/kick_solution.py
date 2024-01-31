@@ -3,6 +3,7 @@ from BPM import BPM
 from Corrector import Corrector
 from typing import List
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 def setup_bpms() -> List[BPM]:
@@ -29,17 +30,6 @@ def setup_correctors() -> List[Corrector]:
 def set_initial_orbit(
     correctors: List[Corrector], bpms: List[BPM], initial_strength: float
 ) -> None:
-    """
-    This script is the start of the home work where you
-    have to close 3-kickers bump using DCV01, DCV04,
-    and DCV05 correctors in MEBT.
-
-    It shows how to create PV names and communicate with
-    the Virtual Accelerator.
-
-    >virtual_accelerator --debug  --sequences MEBT
-
-    """
     # ---- set DCV01 t0 field 0.05 [T]
     correctors[0].field_strength = initial_strength
 
@@ -49,10 +39,13 @@ def set_initial_orbit(
     # ---- Let's print BPM signals before bump closing
     # -------------------------------------------------
     print("======= BPMs before Closing =====")
-    for bpm in bpms:
-        print("BPM PV=", bpm.name, " y_avg[mm] = %+12.5g " % bpm.y_average)
+    print_bpm_status(bpms)
     print("=================================")
     return [bpm.y_average for bpm in bpms]
+
+
+def print_bpm_status(bpms: List[BPM]):
+    [print(f"{bpm.name} y_avg[mm] = {bpm.y_average}") for bpm in bpms]
 
 
 def perform_orbit_kick(
@@ -65,47 +58,68 @@ def perform_orbit_kick(
     # keep changing strengths until difference
     # between the first and last bpm y-value are within
     # the defined tolerance
-    while abs(bpms_y[0] - bpms_y[-1]) > acceptance_tolerance:
+    while abs(abs(bpms_y[0]) - abs(bpms_y[-1])) >= acceptance_tolerance:
         for c_index, corrector in enumerate(correctors[1:]):
             # set the field strength to the bpm-delta
             corrector.field_strength = delta_bpms_y[c_index]
             time.sleep(2)
-            print("======= BPMs after iteration =====")
             for b_index, bpm in enumerate(bpms):
+                # calculate delta y's after b-field change
                 delta_bpms_y[b_index] = bpms_y[b_index] - delta_bpms_y[b_index]
+                # record new bpm y
                 bpms_y[b_index] = bpm.y_average
-            [print(f"{bpm.name} y_avg[mm] = {bpm.y_average}") for bpm in bpms]
+            print("======= BPMs after iteration =====")
+            print_bpm_status(bpms)
             print("=================================")
     print("======= BPMs after Closing =====")
-    for bpm in bpms:
-        print("BPM PV=", bpm.name, " y_avg[mm] = %+12.5g " % bpm.y_average)
+    print_bpm_status(bpms)
     print("=================================")
     return [bpm.y_average for bpm in bpms], [
         corrector.field_strength for corrector in correctors
     ]
 
 
+"""
+This script is the start of the home work where you
+have to close 3-kickers bump using DCV01, DCV04,
+and DCV05 correctors in MEBT.
+
+It shows how to create PV names and communicate with
+the Virtual Accelerator.
+
+>virtual_accelerator --debug  --sequences MEBT
+
+"""
 if __name__ == "__main__":
-    correctors = setup_correctors()
-    bpms = setup_bpms()
-    initial_bpm_y = set_initial_orbit(
-        correctors=correctors,
-        bpms=bpms,
-        initial_strength=0.05,
-    )
-    plt.plot([i for i in range(len(initial_bpm_y))], initial_bpm_y)
-    plt.xlabel("BPM index [units]")
-    plt.ylabel("BPM Y Average readback [mm]")
-    plt.show()
-    plt.show()
-    final_bpm_y, final_corr_b = perform_orbit_kick(
-        correctors=correctors,
-        bpms=bpms,
-        acceptance_tolerance=0.005,
-    )
-    plt.plot([i for i in range(len(final_bpm_y))], final_bpm_y)
-    plt.xlabel("BPM index [units]")
-    plt.ylabel("BPM Y Average readback [mm]")
-    plt.show()
-    for i, corrector in enumerate(correctors):
-        print(f"Corrector {i} Value: {correctors[i].field_strength}")
+    initial_strengths = [0.01, 0.05, 0.07]
+    for strength in initial_strengths:
+        correctors = setup_correctors()
+        bpms = setup_bpms()
+        initial_bpm_y = set_initial_orbit(
+            correctors=correctors,
+            bpms=bpms,
+            initial_strength=strength,
+        )
+        bpm_names = [bpms[i].name for i in range(len(initial_bpm_y))]
+        fig_pre = plt.figure()
+        plt.plot(bpm_names, initial_bpm_y)
+        plt.xlabel("BPM")
+        plt.ylabel("BPM Y Average readback [mm]")
+        plt.title(
+            f"Initial BPM Positions through lattice (initial corrector strength: {strength} [T])"
+        )
+        final_bpm_y, final_corr_b = perform_orbit_kick(
+            correctors=correctors,
+            bpms=bpms,
+            acceptance_tolerance=0.005,
+        )
+        fig_post = plt.figure()
+        plt.plot(bpm_names, final_bpm_y)
+        plt.xlabel("BPM")
+        plt.ylabel("BPM Y Average readback [mm]")
+        plt.title(
+            f"Final BPM Positions through lattice (initial corrector strength: {strength} [T])"
+        )
+        plt.show()
+        for i, corrector in enumerate(correctors):
+            print(f"{corrector.name} Strength[T] = {correctors[i].field_strength}")
