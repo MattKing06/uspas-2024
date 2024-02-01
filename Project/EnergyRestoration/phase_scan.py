@@ -12,7 +12,7 @@ import sys
 import math
 import time
 
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 
 from epics import pv as pv_channel
@@ -61,7 +61,37 @@ import yaml
 from pv_definitions import bpms_and_pv, cavities_and_pv
 
 
-def do_amp_scan():
+def do_scan_without_cavity_a():
+    # set initial cavity-d
+    initial_d_phase = -28.1536
+    cavities_and_pv["d"]["PHASE_SET"].put(initial_d_phase)
+    [pvs["AMP_SET"].put(0.0) for _, pvs in cavities_and_pv.items()]
+    time.sleep(1.1)
+    [print(_, pvs["AMP_SET"].get()) for _, pvs in cavities_and_pv.items()]
+    # turn A on
+    scan_data = {"scans": {}}
+    for cavity, pvs in cavities_and_pv.items():
+        if cavity == "a":
+            continue
+        initial_cavity_phase = pvs["PHASE_SET"].get()
+        scan_data["scans"].update({cavity: {}})
+        print(f"Turn Cavity {cavity} On")
+        pvs["AMP_SET"].put(1.0)
+        print(f"Phase Scan for Cavity {cavity}")
+        phase_scan_data = do_phase_scan(cavity)
+        scan_data["scans"].update({cavity: phase_scan_data})
+        print(scan_data)
+        bpm_min_index = phase_scan_data["BPM_PHASES"]["BPM32"].index(
+            min(phase_scan_data["BPM_PHASES"]["BPM32"])
+        )
+        accelerating_phase = phase_scan_data["RF_PHASES"][bpm_min_index]
+        pvs["PHASE_SET"].put(accelerating_phase)
+        time.sleep(1.1)
+    with open("all_cavity_phase_scans.yml", "w") as file:
+        yaml.safe_dump(scan_data, file)
+
+
+def do_all_cavity_scan():
     # set initial cavity-d
     initial_d_phase = -28.1536
     cavities_and_pv["d"]["PHASE_SET"].put(initial_d_phase)
@@ -75,18 +105,19 @@ def do_amp_scan():
         scan_data["scans"].update({cavity: {}})
         print(f"Turn Cavity {cavity} On")
         pvs["AMP_SET"].put(1.0)
+        time.sleep(0.6)
         print(f"Phase Scan for Cavity {cavity}")
         phase_scan_data = do_phase_scan(cavity)
         scan_data["scans"].update({cavity: phase_scan_data})
         print(scan_data)
         pvs["PHASE_SET"].put(initial_cavity_phase)
-        time.sleep(1.1)
-    with open("all_cavity_phase_scans.yml", "w") as file:
+        time.sleep(0.6)
+    with open("all_cavity_phase_scans_unwrapped.yml", "w") as file:
         yaml.safe_dump(scan_data, file)
 
 
 def do_phase_scan(cavity_name):
-    phase_scan_values = range(-180, 180, 2)
+    phase_scan_values = range(-180, 182, 2)
     phase_scan_data = {}
     phase_scan_data["RF_PHASES"] = []
     phase_scan_data["RF_AMPLITUDE"] = []
@@ -95,7 +126,7 @@ def do_phase_scan(cavity_name):
     for phase in phase_scan_values:
         cavities_and_pv[cavity_name]["PHASE_SET"].put(phase)
         print(f"Phase Set {phase}")
-        time.sleep(1.1)
+        time.sleep(0.6)
         phase_scan_data["RF_PHASES"].append(
             cavities_and_pv[cavity_name]["PHASE_SET"].get()
         )
@@ -106,8 +137,9 @@ def do_phase_scan(cavity_name):
             if bpm not in phase_scan_data["BPM_PHASES"]:
                 phase_scan_data["BPM_PHASES"].update({bpm: []})
             phase_scan_data["BPM_PHASES"][bpm].append(pvs["PHASE"].get())
+            phase_scan_data["BPM_PHASES"][bpm] =np.ndarray.tolist(np.rad2deg(np.unwrap(np.deg2rad(phase_scan_data["BPM_PHASES"][bpm]))))
     return phase_scan_data
 
 
 if __name__ == "__main__":
-    do_amp_scan()
+    do_all_cavity_scan()

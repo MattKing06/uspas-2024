@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 data = {}
-with open("all_cavity_phase_scans.yml", "r") as file:
+with open("all_cavity_phase_scans_unwrapped.yml", "r") as file:
     data = yaml.safe_load(file)
 
 # print(data)
@@ -48,7 +48,7 @@ plt.plot(rf_phases, d_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, d_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity d")
 plt.legend()
-# plt.show()
+plt.show()
 
 from uspas_pylib.harmonic_data_fitting_lib import fitCosineFunc, CosFittingScorer
 

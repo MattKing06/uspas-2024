@@ -65,7 +65,7 @@ a_energy_calculate = energy_from_bpm_phases(
     a_bpm_32_phases[a_nominal_phase_index],
     Energy_SCL_LLRF_FCM23a,
 )
-print('Energy Cavity A [MeV]: ', a_energy_calculate / (1e6))
+print("Energy Cavity A [MeV]: ", a_energy_calculate / (1e6))
 
 
 b_nominal_phase_index = rf_phases.index(cavity_b_init_phase)
@@ -74,9 +74,9 @@ b_energy_calculate = energy_from_bpm_phases(
     b_bpm_32_phases[b_nominal_phase_index],
     a_energy_calculate,
     phase_offset_bpm_23=a_bpm_23_phases[a_nominal_phase_index],
-    phase_offset_bpm_32=a_bpm_32_phases[a_nominal_phase_index]
+    phase_offset_bpm_32=a_bpm_32_phases[a_nominal_phase_index],
 )
-print('Energy Cavity B [MeV]: ', b_energy_calculate / (1e6))
+print("Energy Cavity B [MeV]: ", b_energy_calculate / (1e6))
 
 
 c_nominal_phase_index = rf_phases.index(cavity_c_init_phase)
@@ -85,9 +85,9 @@ c_energy_calculate = energy_from_bpm_phases(
     c_bpm_32_phases[c_nominal_phase_index],
     b_energy_calculate,
     phase_offset_bpm_23=b_bpm_23_phases[b_nominal_phase_index],
-    phase_offset_bpm_32=b_bpm_32_phases[b_nominal_phase_index]
+    phase_offset_bpm_32=b_bpm_32_phases[b_nominal_phase_index],
 )
-print('Energy Cavity C [MeV]: ', c_energy_calculate / (1e6))
+print("Energy Cavity C [MeV]: ", c_energy_calculate / (1e6))
 
 
 d_nominal_phase_index = rf_phases.index(cavity_d_init_phase)
@@ -96,12 +96,20 @@ d_energy_calculate = energy_from_bpm_phases(
     d_bpm_32_phases[d_nominal_phase_index],
     c_energy_calculate,
     phase_offset_bpm_23=c_bpm_23_phases[c_nominal_phase_index],
-    phase_offset_bpm_32=c_bpm_32_phases[c_nominal_phase_index]
+    phase_offset_bpm_32=c_bpm_32_phases[c_nominal_phase_index],
 )
-print('Energy Cavity D [MeV]: ', d_energy_calculate / (1e6))
+print("Energy Cavity D [MeV]: ", d_energy_calculate / (1e6))
 
 
-print(f'Cav A: bpm 23/32 at rf phase {rf_phases[a_nominal_phase_index]}  = {a_bpm_23_phases[a_nominal_phase_index]} / {a_bpm_32_phases[a_nominal_phase_index]}')
-print(f'Cav B: bpm 23/32 at rf phase {rf_phases[b_nominal_phase_index]}  = {b_bpm_23_phases[b_nominal_phase_index]} / {b_bpm_32_phases[b_nominal_phase_index]}')
-print(f'Cav C: bpm 23/32 at rf phase {rf_phases[c_nominal_phase_index]}  = {c_bpm_23_phases[c_nominal_phase_index]} / {c_bpm_32_phases[c_nominal_phase_index]}')
-print(f'Cav D: bpm 23/32 at rf phase {rf_phases[d_nominal_phase_index]}  = {d_bpm_23_phases[d_nominal_phase_index]} / {d_bpm_32_phases[d_nominal_phase_index]}')
+print(
+    f"Cav A: bpm 23/32 at rf phase {rf_phases[a_nominal_phase_index]}  = {a_bpm_23_phases[a_nominal_phase_index]} / {a_bpm_32_phases[a_nominal_phase_index]}"
+)
+print(
+    f"Cav B: bpm 23/32 at rf phase {rf_phases[b_nominal_phase_index]}  = {b_bpm_23_phases[b_nominal_phase_index]} / {b_bpm_32_phases[b_nominal_phase_index]}"
+)
+print(
+    f"Cav C: bpm 23/32 at rf phase {rf_phases[c_nominal_phase_index]}  = {c_bpm_23_phases[c_nominal_phase_index]} / {c_bpm_32_phases[c_nominal_phase_index]}"
+)
+print(
+    f"Cav D: bpm 23/32 at rf phase {rf_phases[d_nominal_phase_index]}  = {d_bpm_23_phases[d_nominal_phase_index]} / {d_bpm_32_phases[d_nominal_phase_index]}"
+)
