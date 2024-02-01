@@ -33,3 +33,10 @@ t = (min_bpm_phase - phase_offset) / bpm_frequency
 print(f'{t = } ')
 delta_beta = (L_dist/(t*v_light)) - beta
 print(f'{delta_beta = } ')
+
+delta_energy = mass*math.pow(gamma,3)*math.pow(beta,3)*(v_light*L_dist)*((2*math.pi)/bpm_frequency)
+print(f'{delta_energy=}')
+delta_energy = e_kin_ini*L_dist*t
+print(f'{delta_energy=}')
+veff = delta_energy/1.6e-19
+print(f'{veff=}')
