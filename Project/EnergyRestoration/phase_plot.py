@@ -69,4 +69,4 @@ for cavity, dataset in data["scans"].items():
 print(cosine_fit_data)
 
 with open("cosine_fitted_data.yml", "w") as file:
-    yaml.safe_dump(cosine_fit_data)
+    yaml.dump(cosine_fit_data, file)
