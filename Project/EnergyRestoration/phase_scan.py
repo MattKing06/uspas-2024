@@ -158,4 +158,4 @@ def do_phase_scan(cavity_name):
 
 
 if __name__ == "__main__":
-    do_all_cavity_scan()
+    do_scan_without_cavity_a()
