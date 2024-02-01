@@ -59,14 +59,14 @@ v_light = 2.99792458e8  # in [m/sec]
 
 import yaml
 from pv_definitions import bpms_and_pv, cavities_and_pv
-
+SLEEP_TIME = 1.5
 
 def do_scan_without_cavity_a():
     # set initial cavity-d
     initial_d_phase = -28.1536
     cavities_and_pv["d"]["PHASE_SET"].put(initial_d_phase)
     [pvs["AMP_SET"].put(0.0) for _, pvs in cavities_and_pv.items()]
-    time.sleep(1.1)
+    time.sleep(SLEEP_TIME)
     [print(_, pvs["AMP_SET"].get()) for _, pvs in cavities_and_pv.items()]
     # turn A on
     scan_data = {"scans": {}}
@@ -83,7 +83,7 @@ def do_scan_without_cavity_a():
             continue
         print(f"Turn Cavity {cavity} On")
         pvs["AMP_SET"].put(1.0)
-        time.sleep(1.1)
+        time.sleep(SLEEP_TIME)
         initial_cavity_phase = pvs["PHASE_SET"].get()
         initial_bpm_32_phase = bpms_and_pv["BPM32"]["PHASE"].get()
         initial_bpm_23_phase = bpms_and_pv["BPM23"]["PHASE"].get()
@@ -103,17 +103,26 @@ def do_scan_without_cavity_a():
         accelerating_phase = phase_scan_data["RF_PHASES"][bpm_min_index]
         # Set to accelerating phase.
         pvs["PHASE_SET"].put(accelerating_phase)
-        time.sleep(1.1)
+        time.sleep(SLEEP_TIME)
     with open("cavity_phase_scans_without_A_unwrapped.yml", "w") as file:
         yaml.safe_dump(scan_data, file)
 
+def set_initial_cavity_phases():
+    cavity_a_init_phase = 142
+    cavity_b_init_phase = -126
+    cavity_c_init_phase = -60
+    cavity_d_init_phase = -28
+    cavities_and_pv['a']['PHASE_SET'].put(cavity_a_init_phase)
+    cavities_and_pv['b']['PHASE_SET'].put(cavity_b_init_phase)
+    cavities_and_pv['c']['PHASE_SET'].put(cavity_c_init_phase)
+    cavities_and_pv['d']['PHASE_SET'].put(cavity_d_init_phase)
 
 def do_all_cavity_scan():
     # set initial cavity-d
     initial_d_phase = -28.1536
     cavities_and_pv["d"]["PHASE_SET"].put(initial_d_phase)
     [pvs["AMP_SET"].put(0.0) for _, pvs in cavities_and_pv.items()]
-    time.sleep(1.1)
+    time.sleep(SLEEP_TIME)
     [print(_, pvs["AMP_SET"].get()) for _, pvs in cavities_and_pv.items()]
     # turn A on
     scan_data = {"scans": {}}
@@ -121,7 +130,8 @@ def do_all_cavity_scan():
         scan_data["scans"].update({cavity: {}})
         print(f"Turn Cavity {cavity} On")
         pvs["AMP_SET"].put(1.0)
-        time.sleep(1.1)
+        time.sleep(SLEEP_TIME)
+        [print(_, pvs["AMP_SET"].get()) for _, pvs in cavities_and_pv.items()]
         initial_cavity_phase = pvs["PHASE_SET"].get()
         initial_bpm_32_phase = bpms_and_pv["BPM32"]["PHASE"].get()
         initial_bpm_23_phase = bpms_and_pv["BPM23"]["PHASE"].get()
@@ -134,7 +144,7 @@ def do_all_cavity_scan():
         scan_data["scans"].update({cavity: phase_scan_data})
         print(scan_data)
         pvs["PHASE_SET"].put(initial_cavity_phase)
-        time.sleep(1.1)
+        time.sleep(SLEEP_TIME)
     with open("all_cavity_phase_scans_unwrapped.yml", "w") as file:
         yaml.safe_dump(scan_data, file)
 
@@ -149,7 +159,7 @@ def do_phase_scan(cavity_name):
     for phase in phase_scan_values:
         cavities_and_pv[cavity_name]["PHASE_SET"].put(phase)
         print(f"Phase Set {phase}")
-        time.sleep(1.1)
+        time.sleep(SLEEP_TIME)
         phase_scan_data["RF_PHASES"].append(
             cavities_and_pv[cavity_name]["PHASE_SET"].get()
         )
@@ -166,4 +176,6 @@ def do_phase_scan(cavity_name):
 
 if __name__ == "__main__":
     # do_scan_without_cavity_a()
-    do_all_cavity_scan()
+    set_initial_cavity_phases()
+    do_scan_without_cavity_a()
+    #do_all_cavity_scan()

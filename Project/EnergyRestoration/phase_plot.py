@@ -10,17 +10,17 @@ with open("all_cavity_phase_scans_unwrapped.yml", "r") as file:
 # print(data)
 from matplotlib import pyplot as plt
 
-rf_phases = data["scans"]["a"]["RF_PHASES"]
-a_bpm_23_phases = data["scans"]["a"]["BPM_PHASES"]["BPM23"]
-a_bpm_32_phases = data["scans"]["a"]["BPM_PHASES"]["BPM32"]
-a_init_rf_phase = data['initial_for_cavity_a']['init_cav_phase']
-a_init_bpm_32_phase = data['initial_for_cavity_a']['init_bpm_32_phase']
-plt.figure()
-plt.scatter([a_init_rf_phase], [a_init_bpm_32_phase ])
-plt.plot(rf_phases, a_bpm_23_phases, label="bpm_23")
-plt.plot(rf_phases, a_bpm_32_phases, label="bpm_32")
-plt.title("Phase Scan Cavity a")
-plt.legend()
+# rf_phases = data["scans"]["a"]["RF_PHASES"]
+# a_bpm_23_phases = data["scans"]["a"]["BPM_PHASES"]["BPM23"]
+# a_bpm_32_phases = data["scans"]["a"]["BPM_PHASES"]["BPM32"]
+# a_init_rf_phase = data['initial_for_cavity_a']['init_cav_phase']
+# a_init_bpm_32_phase = data['initial_for_cavity_a']['init_bpm_32_phase']
+# plt.figure()
+# plt.scatter([a_init_rf_phase], [a_init_bpm_32_phase ])
+# plt.plot(rf_phases, a_bpm_23_phases, label="bpm_23")
+# plt.plot(rf_phases, a_bpm_32_phases, label="bpm_32")
+# plt.title("Phase Scan Cavity a")
+# plt.legend()
 
 
 rf_phases = data["scans"]["b"]["RF_PHASES"]
@@ -65,6 +65,8 @@ from uspas_pylib.harmonic_data_fitting_lib import fitCosineFunc, CosFittingScore
 
 cosine_fit_data = {}
 for cavity, dataset in data["scans"].items():
+    if cavity == 'a':
+        continue
     rf_phases = dataset["RF_PHASES"]
     bpm_32_phases = dataset["BPM_PHASES"]["BPM32"]
     (
@@ -79,5 +81,5 @@ for cavity, dataset in data["scans"].items():
     }
 print(cosine_fit_data)
 
-with open("cosine_fitted_data.yml", "w") as file:
+with open("cosine_fitted_data_missing_cavity_A.yml", "w") as file:
     yaml.dump(cosine_fit_data, file)
