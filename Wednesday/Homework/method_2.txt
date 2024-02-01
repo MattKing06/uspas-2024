@@ -1,0 +1,9 @@
+Calculated the slope of each RF-Phase vs BPM-Phase line:
+RF_AMPLITUDE_0.2  Veff :  -0.1950108057679322
+RF_AMPLITUDE_0.4  Veff :  -0.38983749049674765
+RF_AMPLITUDE_0.6  Veff :  -0.5844722713864672
+RF_AMPLITUDE_0.8  Veff :  -0.7789061843187782
+RF_AMPLITUDE_1.0  Veff :  -0.9731300895421849
+
+Does it make sense to average over these? 
+I would assume Veff is dependent on RF Amplitude so averaging doesn't make sense.

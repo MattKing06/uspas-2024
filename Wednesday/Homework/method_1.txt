@@ -1,0 +1,12 @@
+maximum accelerating phase [deg] = -178
+zero accelerating phase [deg] = max_acc_phase - 90 = -268
+delta phi max = 60.15 (after cosine fit on rf vs bpm phase data)
+fitted phase_offset[deg] =  -2.413
+
+calculated time using:
+t = (zero_acc_bpm_phase - phase_offset) / bpm_frequency
+time of flight [s] = 1.7158232735173712e-08
+
+delta_beta = L_dist/(t*c) - beta_init = -0.0242
+
+Not sure where to go from here to calculate Veff.
