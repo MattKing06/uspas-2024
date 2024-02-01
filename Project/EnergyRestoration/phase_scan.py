@@ -84,6 +84,13 @@ def do_scan_without_cavity_a():
         print(f"Turn Cavity {cavity} On")
         pvs["AMP_SET"].put(1.0)
         time.sleep(1.1)
+        initial_cavity_phase = pvs["PHASE_SET"].get()
+        initial_bpm_32_phase = bpms_and_pv["BPM32"]["PHASE"].get()
+        initial_bpm_23_phase = bpms_and_pv["BPM23"]["PHASE"].get()
+        print(f"{cavity=}: {initial_cavity_phase=} : {initial_bpm_23_phase=} : {initial_bpm_32_phase}")
+        scan_data[f'initial_for_cavity_{cavity}'] = {'init_cav_phase' : initial_cavity_phase,
+                                                     'init_bpm_23_phase' : initial_bpm_23_phase,
+                                                     'init_bpm_32_phase' : initial_bpm_32_phase,}
         print(f"Phase Scan for Cavity {cavity}")
         phase_scan_data = do_phase_scan(cavity)
         scan_data["scans"].update({cavity: phase_scan_data})
@@ -111,6 +118,10 @@ def do_all_cavity_scan():
     # turn A on
     scan_data = {"scans": {}}
     for cavity, pvs in cavities_and_pv.items():
+        scan_data["scans"].update({cavity: {}})
+        print(f"Turn Cavity {cavity} On")
+        pvs["AMP_SET"].put(1.0)
+        time.sleep(1.1)
         initial_cavity_phase = pvs["PHASE_SET"].get()
         initial_bpm_32_phase = bpms_and_pv["BPM32"]["PHASE"].get()
         initial_bpm_23_phase = bpms_and_pv["BPM23"]["PHASE"].get()
@@ -118,10 +129,6 @@ def do_all_cavity_scan():
         scan_data[f'initial_for_cavity_{cavity}'] = {'init_cav_phase' : initial_cavity_phase,
                                                      'init_bpm_23_phase' : initial_bpm_23_phase,
                                                      'init_bpm_32_phase' : initial_bpm_32_phase,}
-        scan_data["scans"].update({cavity: {}})
-        print(f"Turn Cavity {cavity} On")
-        pvs["AMP_SET"].put(1.0)
-        time.sleep(1.1)
         print(f"Phase Scan for Cavity {cavity}")
         phase_scan_data = do_phase_scan(cavity)
         scan_data["scans"].update({cavity: phase_scan_data})
@@ -133,7 +140,7 @@ def do_all_cavity_scan():
 
 
 def do_phase_scan(cavity_name):
-    phase_scan_values = range(-180, 182, 2)
+    phase_scan_values = range(-180, 185, 5)
     phase_scan_data = {}
     phase_scan_data["RF_PHASES"] = []
     phase_scan_data["RF_AMPLITUDE"] = []
@@ -158,4 +165,5 @@ def do_phase_scan(cavity_name):
 
 
 if __name__ == "__main__":
-    do_scan_without_cavity_a()
+    # do_scan_without_cavity_a()
+    do_all_cavity_scan()
