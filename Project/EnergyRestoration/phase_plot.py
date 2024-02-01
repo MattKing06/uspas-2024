@@ -13,8 +13,10 @@ from matplotlib import pyplot as plt
 rf_phases = data["scans"]["a"]["RF_PHASES"]
 a_bpm_23_phases = data["scans"]["a"]["BPM_PHASES"]["BPM23"]
 a_bpm_32_phases = data["scans"]["a"]["BPM_PHASES"]["BPM32"]
-
+a_init_rf_phase = data['initial_for_cavity_a']['init_cav_phase']
+a_init_bpm_32_phase = data['initial_for_cavity_a']['init_bpm_32_phase']
 plt.figure()
+plt.scatter([a_init_rf_phase], [a_init_bpm_32_phase ])
 plt.plot(rf_phases, a_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, a_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity a")
@@ -24,7 +26,10 @@ plt.legend()
 rf_phases = data["scans"]["b"]["RF_PHASES"]
 b_bpm_23_phases = data["scans"]["b"]["BPM_PHASES"]["BPM23"]
 b_bpm_32_phases = data["scans"]["b"]["BPM_PHASES"]["BPM32"]
+b_init_rf_phase = data['initial_for_cavity_b']['init_cav_phase']
+b_init_bpm_32_phase = data['initial_for_cavity_b']['init_bpm_32_phase']
 plt.figure()
+plt.scatter([b_init_rf_phase], [b_init_bpm_32_phase ])
 plt.plot(rf_phases, b_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, b_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity b")
@@ -33,7 +38,10 @@ plt.legend()
 rf_phases = data["scans"]["c"]["RF_PHASES"]
 c_bpm_23_phases = data["scans"]["c"]["BPM_PHASES"]["BPM23"]
 c_bpm_32_phases = data["scans"]["c"]["BPM_PHASES"]["BPM32"]
+c_init_rf_phase = data['initial_for_cavity_c']['init_cav_phase']
+c_init_bpm_32_phase = data['initial_for_cavity_c']['init_bpm_32_phase']
 plt.figure()
+plt.scatter([c_init_rf_phase], [c_init_bpm_32_phase ])
 plt.plot(rf_phases, c_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, c_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity c")
@@ -43,7 +51,10 @@ plt.legend()
 rf_phases = data["scans"]["d"]["RF_PHASES"]
 d_bpm_23_phases = data["scans"]["d"]["BPM_PHASES"]["BPM23"]
 d_bpm_32_phases = data["scans"]["d"]["BPM_PHASES"]["BPM32"]
+d_init_rf_phase = data['initial_for_cavity_d']['init_cav_phase']
+d_init_bpm_32_phase = data['initial_for_cavity_d']['init_bpm_32_phase']
 plt.figure()
+plt.scatter([d_init_rf_phase], [d_init_bpm_32_phase ])
 plt.plot(rf_phases, d_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, d_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity d")
