@@ -73,16 +73,16 @@ plt.plot(rf_phases, d_bpm_23_phases, label="bpm_23")
 plt.plot(rf_phases, d_bpm_32_phases, label="bpm_32")
 plt.title("Phase Scan Cavity D")
 plt.legend()
-plt.show()
+#plt.show()
 
 from uspas_pylib.harmonic_data_fitting_lib import fitCosineFunc, CosFittingScorer
 
+with open('phase_energy_scan_unwrapped.yml', 'r') as file:
+    data = yaml.safe_load(file)
 cosine_fit_data = {}
-for cavity, dataset in data["scans"].items():
-    if cavity == "a":
-        continue
+for cavity, dataset in data.items():
     rf_phases = dataset["RF_PHASES"]
-    bpm_32_phases = dataset["BPM_PHASES"]["BPM32"]
+    bpm_32_phases = dataset["DELTA_ENERGY"]
     (
         results,
         _,
@@ -95,5 +95,5 @@ for cavity, dataset in data["scans"].items():
     }
 print(cosine_fit_data)
 
-with open("cosine_fitted_data_missing_cavity_A.yml", "w") as file:
+with open("energy_scan_cosine_fitted_data.yml", "w") as file:
     yaml.dump(cosine_fit_data, file)

@@ -22,57 +22,29 @@ import numpy as np
 import scipy
 
 
-def energy_from_bpm_phases(
-    phase_bpm_23: float,
-    phase_bpm_32: float,
-    energy_guess_ev: float,
-    phase_offset_bpm_23: float = 56.0608,
-    phase_offset_bpm_32: float = -171.2920,
-    position_bpm_23: float = 93.662,
-    position_bpm_32: float = 164.681,
-    bpm_frequency: float = 402.5e6,
+def energy_from_bpm_phases(phase_bpm_23: float,
+phase_bpm_32: float,
+energy_guess_ev: float,
+phase_offset_bpm_23: float = 56.0608,
+phase_offset_bpm_32: float = -171.2920,
+position_bpm_23: float = 93.662,
+position_bpm_32: float = 164.681,
+bpm_frequency: float = 402.5E6
 ) -> float:
     delta_z = position_bpm_32 - position_bpm_23
-    delta_phi = np.radians(phase_bpm_32 - phase_bpm_23)
     delta_phase_bpm_23 = phase_bpm_23 - phase_offset_bpm_23
-    # if delta_phase_bpm_23 < -180:
-    #     delta_phase_bpm_23 += 360
     delta_phase_bpm_32 = phase_bpm_32 - phase_offset_bpm_32
-    # if delta_phase_bpm_32 < -180:
-    #     delta_phase_bpm_32 += 360
     delta_phase_bpm_23 = np.radians(delta_phase_bpm_23)
     delta_phase_bpm_32 = np.radians(delta_phase_bpm_32)
-    delta_phi_zero = np.radians(phase_offset_bpm_32 - phase_offset_bpm_23)
     omega_bpm = 2 * math.pi * bpm_frequency
-    energy_rest = (
-        scipy.constants.physical_constants["proton mass energy equivalent in MeV"][0]
-        * 1e6
-    )
+    energy_rest = scipy.constants.physical_constants["proton mass energy equivalent in MeV"][0] * 1E6
     c = scipy.constants.speed_of_light
     gamma_zero = (energy_rest + energy_guess_ev) / energy_rest
-    beta_zero = math.sqrt(1 - 1 / gamma_zero**2)
-    delta_phi_energy_guess = omega_bpm * delta_z / c / beta_zero - 2 * math.pi
-    energy_kin = np.inf
-    n = 100
-    while energy_kin > energy_guess_ev:
-        # print(energy_kin, n)
-        beta = (
-            omega_bpm
-            * delta_z
-            / c
-            / (2 * n * math.pi + (delta_phase_bpm_32 - delta_phase_bpm_23))
-        )
-        gamma = math.sqrt(1 / (1 - beta**2))
-        energy_kin = (gamma - 1) * energy_rest
-        n += 1
-    n -= 2
-    beta = (
-        omega_bpm
-        * delta_z
-        / c
-        / (2 * n * math.pi + (delta_phase_bpm_32 - delta_phase_bpm_23))
-    )
-    gamma = math.sqrt(1 / (1 - beta**2))
+    beta_zero = math.sqrt(1 - 1 / gamma_zero ** 2)
+    delta_phi_energy_guess = omega_bpm * delta_z / c / beta_zero
+    n = math.floor(delta_phi_energy_guess / 2 / math.pi)
+    beta = omega_bpm * delta_z / c / (2 * n * math.pi + (delta_phase_bpm_32 - delta_phase_bpm_23))
+    gamma = math.sqrt(1 / (1 - beta ** 2))
     energy_kin = (gamma - 1) * energy_rest
     return energy_kin
 
@@ -84,10 +56,12 @@ Phi_Offset_SCL_Diag_BPM32 = -171.2920
 
 if __name__ == "__main__":
 
-    with open("all_cavity_phase_scans_unwrapped.yml", "r") as file:
+    with open("cavity_phase_scans_without_A_unwrapped.yml", "r") as file:
         phase_scan_data = yaml.safe_load(file)
     energy_vs_phase_dataset = {}
     for cavity, data in phase_scan_data["scans"].items():
+        if cavity == 'a':
+            continue
         energy_vs_phase_dataset[cavity] = {}
         energy_vs_phase_dataset[cavity]["RF_PHASES"] = data["RF_PHASES"]
         energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = []
@@ -95,10 +69,10 @@ if __name__ == "__main__":
         bpm_23_phases = data["BPM_PHASES"]["BPM23"]
         bpm_32_phases = data["BPM_PHASES"]["BPM32"]
         energies = {
-            "a": e_init,
-            "b": 958.2301700877831e6,
-            "c": 972.2218858065837e6,
-            "d": 972.2218858065837e6,
+            "a": None,
+            "b": e_init,#958.2301700877831e6,
+            "c": 958.2301700877831e6,
+            "d": 972.2218858065837e6 + 28e6,
         }
         for p_23, p_32 in zip(bpm_23_phases, bpm_32_phases):
             current_energy = energy_from_bpm_phases(
@@ -117,13 +91,7 @@ if __name__ == "__main__":
             energy_vs_phase_dataset[cavity]["DELTA_ENERGY"].append(
                 current_energy
             )
-            # energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = np.ndarray.tolist(
-            #     np.rad2deg(
-            #         np.unwrap(
-            #             np.deg2rad(energy_vs_phase_dataset[cavity]["DELTA_ENERGY"])
-            #         )
-            #     )
-            # )
+
 
         from matplotlib import pyplot as plt
         plt.figure()
@@ -133,7 +101,7 @@ if __name__ == "__main__":
             energy_vs_phase_dataset[cavity]["DELTA_ENERGY"],
         )
     plt.show()
-    with open("phase_energy_scan_unwrapped.yml", "w") as file:
+    with open("phase_energy_scan_unwrapped_without_cavity_A.yml", "w") as file:
         yaml.dump(energy_vs_phase_dataset, file)
     cavity_A = energy_from_bpm_phases(
         -175.9220137950059,
