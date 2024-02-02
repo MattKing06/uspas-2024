@@ -79,8 +79,55 @@ def energy_from_bpm_phases(
 
 import yaml
 
+Phi_Offset_SCL_Diag_BPM23 = 56.0608
+Phi_Offset_SCL_Diag_BPM32 = -171.2920
+
 if __name__ == "__main__":
 
+    with open("all_cavity_phase_scans_unwrapped.yml", "r") as file:
+        phase_scan_data = yaml.safe_load(file)
+    energy_vs_phase_dataset = {}
+    for cavity, data in phase_scan_data["scans"].items():
+        energy_vs_phase_dataset[cavity] = {}
+        energy_vs_phase_dataset[cavity]["RF_PHASES"] = data["RF_PHASES"]
+        energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = []
+        e_init = 945e6
+        bpm_23_phases = data["BPM_PHASES"]["BPM23"]
+        bpm_32_phases = data["BPM_PHASES"]["BPM32"]
+        energies = {
+            "a": e_init,
+            "b": 958.2301700877831e6,
+            "c": 972.2218858065837e6,
+            "d": 972.2218858065837e6,
+        }
+        for p_23, p_32 in zip(bpm_23_phases, bpm_32_phases):
+            energy_vs_phase_dataset[cavity]["DELTA_ENERGY"].append(
+                energy_from_bpm_phases(
+                    p_23,
+                    p_32,
+                    energies[cavity],
+                    Phi_Offset_SCL_Diag_BPM23,
+                    Phi_Offset_SCL_Diag_BPM32,
+                ),
+            )
+            # energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = np.ndarray.tolist(
+            #     np.rad2deg(
+            #         np.unwrap(
+            #             np.deg2rad(energy_vs_phase_dataset[cavity]["DELTA_ENERGY"])
+            #         )
+            #     )
+            # )
+
+        from matplotlib import pyplot as plt
+        plt.figure()
+        plt.title(f'Cavity {cavity}')
+        plt.plot(
+            energy_vs_phase_dataset[cavity]["RF_PHASES"],
+            energy_vs_phase_dataset[cavity]["DELTA_ENERGY"],
+        )
+    plt.show()
+    with open("phase_energy_scan_unwrapped.yml", "w") as file:
+        yaml.dump(energy_vs_phase_dataset, file)
     cavity_A = energy_from_bpm_phases(
         -175.9220137950059,
         -144.69940224251516,
