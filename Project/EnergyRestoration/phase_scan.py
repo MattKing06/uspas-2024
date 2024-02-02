@@ -111,11 +111,12 @@ def do_scan_without_cavity_a():
         )
         # grab the RF phase using the lowest-BPM-phase index
         accelerating_phase = phase_scan_data["RF_PHASES"][bpm_min_index]
-        # Set to accelerating phase.
+        # Set to accelerating phase minus offset.
         rf_phase_offset = 18
-        pvs["PHASE_SET"].put(accelerating_phase, rf_phase_offset)
+        pvs["PHASE_SET"].put(accelerating_phase - rf_phase_offset)
+        scan_data[f'ACCELERATING_PHASE_CAVITY_{cavity}'] = accelerating_phase - rf_phase_offset
         time.sleep(SLEEP_TIME)
-    with open("cavity_phase_scans_without_A_unwrapped.yml", "w") as file:
+    with open("cavity_phase_scans_without_A_unwrapped_ACC_PHASES.yml", "w") as file:
         yaml.safe_dump(scan_data, file)
 
 
