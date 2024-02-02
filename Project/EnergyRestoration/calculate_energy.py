@@ -101,14 +101,21 @@ if __name__ == "__main__":
             "d": 972.2218858065837e6,
         }
         for p_23, p_32 in zip(bpm_23_phases, bpm_32_phases):
-            energy_vs_phase_dataset[cavity]["DELTA_ENERGY"].append(
-                energy_from_bpm_phases(
+            current_energy = energy_from_bpm_phases(
                     p_23,
                     p_32,
                     energies[cavity],
                     Phi_Offset_SCL_Diag_BPM23,
                     Phi_Offset_SCL_Diag_BPM32,
-                ),
+                )
+            if len(energy_vs_phase_dataset[cavity]['DELTA_ENERGY']) == 0:
+                delta_e = 0
+            else:
+                delta_e = current_energy - energy_vs_phase_dataset[cavity]["DELTA_ENERGY"][-1]
+            if abs(delta_e) > 5e6:
+                current_energy -= np.sign(delta_e)*2*25.24157*1e6
+            energy_vs_phase_dataset[cavity]["DELTA_ENERGY"].append(
+                current_energy
             )
             # energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = np.ndarray.tolist(
             #     np.rad2deg(
