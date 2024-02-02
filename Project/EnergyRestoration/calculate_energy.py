@@ -54,14 +54,28 @@ import yaml
 Phi_Offset_SCL_Diag_BPM23 = 56.0608
 Phi_Offset_SCL_Diag_BPM32 = -171.2920
 
+def make_fitted_plot(cavity):
+        with open('energy_scan_cosine_fitted_data_without_cavity_a.yml', 'r') as file:
+            cosine_energy_fit = yaml.safe_load(file)
+        data =  cosine_energy_fit[cavity]
+        if cavity == 'a':
+            return
+        amplitude = data['cosine_fitted_amplitude']
+        avg_value  =data['avg_value']
+        offset = data['phase_offset']
+        print((986e6-972e6)/amplitude)
+        cavity_phase = np.arccos((986e6-972e6)/amplitude) - offset
+        print(f'{cavity} {cavity_phase=}')
+        y = [amplitude*(np.cos(np.radians(x+offset))) + avg_value for x in energy_vs_phase_dataset[cavity]['RF_PHASES']]
+        #plt.plot(energy_vs_phase_dataset[cavity]['RF_PHASES'], y, label='fitted data')
+        #plt.legend()
+
 if __name__ == "__main__":
 
-    with open("cavity_phase_scans_without_A_unwrapped.yml", "r") as file:
+    with open("all_cavity_phase_scans_unwrapped.yml", "r") as file:
         phase_scan_data = yaml.safe_load(file)
     energy_vs_phase_dataset = {}
     for cavity, data in phase_scan_data["scans"].items():
-        if cavity == 'a':
-            continue
         energy_vs_phase_dataset[cavity] = {}
         energy_vs_phase_dataset[cavity]["RF_PHASES"] = data["RF_PHASES"]
         energy_vs_phase_dataset[cavity]["DELTA_ENERGY"] = []
@@ -69,10 +83,10 @@ if __name__ == "__main__":
         bpm_23_phases = data["BPM_PHASES"]["BPM23"]
         bpm_32_phases = data["BPM_PHASES"]["BPM32"]
         energies = {
-            "a": None,
-            "b": e_init,#958.2301700877831e6,
-            "c": 958.2301700877831e6,
-            "d": 972.2218858065837e6 + 28e6,
+            "a": e_init,
+            "b": 958.2301700877831e6,
+            "c": 972.2218858065837e6,
+            "d": 972.2218858065837e6,
         }
         for p_23, p_32 in zip(bpm_23_phases, bpm_32_phases):
             current_energy = energy_from_bpm_phases(
@@ -91,15 +105,31 @@ if __name__ == "__main__":
             energy_vs_phase_dataset[cavity]["DELTA_ENERGY"].append(
                 current_energy
             )
-
-
+    
         from matplotlib import pyplot as plt
         plt.figure()
-        plt.title(f'Cavity {cavity}')
+        plt.title(f'Cavity {str(cavity).upper()}')
+        plt.xlabel('RF Phase [deg]')
+        plt.ylabel('Delta Energy [eV]')
         plt.plot(
             energy_vs_phase_dataset[cavity]["RF_PHASES"],
             energy_vs_phase_dataset[cavity]["DELTA_ENERGY"],
+            label = 'energy scan measurement'
         )
+        make_fitted_plot(cavity)
+
+    cavity_d_phases = energy_vs_phase_dataset['d']['RF_PHASES']
+    cavity_d_energies = energy_vs_phase_dataset['d']['DELTA_ENERGY']
+    diffs = []
+    for energy in cavity_d_energies:
+        diffs.append(np.abs(986e6-energy))
+    index_of_min_diff = np.argmin(diffs)
+    phase_at_min_diff = cavity_d_phases[index_of_min_diff]
+    energy_at_min_diff = cavity_d_energies[index_of_min_diff]
+    print('Min diff Phase [deg] ', cavity_d_phases[index_of_min_diff])
+    plt.scatter([phase_at_min_diff], [energy_at_min_diff])
+    plt.xlabel('RF Phases [deg]')
+    plt.ylabel('Delta Energy [eV]')
     plt.show()
     with open("phase_energy_scan_unwrapped_without_cavity_A.yml", "w") as file:
         yaml.dump(energy_vs_phase_dataset, file)

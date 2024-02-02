@@ -95,5 +95,5 @@ for cavity, dataset in data.items():
     }
 print(cosine_fit_data)
 
-with open("energy_scan_cosine_fitted_data.yml", "w") as file:
+with open("energy_scan_cosine_fitted_data_without_cavity_a.yml", "w") as file:
     yaml.dump(cosine_fit_data, file)
